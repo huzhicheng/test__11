@@ -1,0 +1,153 @@
+swagger: '2.0'
+info:
+  description: " 1. 登录接口 参数在header中 \n
+  2. 退出接口 _action 固定传 logout  \n 3.  token校验接口 _action 参数固定为 validate "
+  version: '1.0'
+  title: honycloud auth microservice API
+host: 'uat.honycapital.com'
+basePath: /openam
+tags:
+  - name: auth-controller
+    description: Auth Controller
+schemes: 
+  - https
+paths:
+  /json/authenticate:
+    post:
+      tags:
+        - auth-controller
+      summary: 登录接口
+      operationId: loginUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: X-OpenAM-Username
+          in: header
+          description: X-OpenAM-Username
+          required: true
+          type: string
+          default: 'otzhaoning'
+        - name: X-OpenAM-Password
+          in: header
+          description: X-OpenAM-Password
+          required: true
+          type: string
+          default: '1234%abcd'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LoginRes'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  /json/sessions:
+    post:
+      tags:
+        - auth-controller
+      summary: 退出接口
+      operationId: logoutUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: iplanetDirectoryPro
+          in: header
+          description: iplanetDirectoryPro
+          required: true
+          type: string
+        - name: _action
+          in: query
+          description: _action
+          default: "logout"
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LogoutRes'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  '/json/sessions/{token}':
+    post:
+      tags:
+        - auth-controller
+      summary: token校验接口
+      operationId: validateUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: token
+          in: path
+          description: token
+          required: true
+          type: string
+        - name: _action
+          in: query
+          default: "validate"
+          description: _action
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ValidateRes'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  LoginRes:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+      reason:
+        type: string
+      successUrl:
+        type: string
+      tokenId:
+        type: string
+    title: LoginRes
+  LogoutRes:
+    type: object
+    properties:
+      result:
+        type: string
+    title: LogoutRes
+  ValidateRes:
+    type: object
+    properties:
+      realm:
+        type: string
+      uid:
+        type: string
+        description: 用户登录名
+        default: otzhaoning
+      valid:
+        type: boolean
+    title: ValidateRes
